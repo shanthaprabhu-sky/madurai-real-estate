@@ -1,0 +1,151 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Property {
+  id             String          @id @default(cuid())
+  slug           String          @unique
+  title          String
+  description    String
+  location       String
+  price          Float
+  imageUrl       String?         @map("image_url")
+  
+  // Filter Categories for Sidebar Matching
+  propertyType   String          @default("Residential Plot") @map("property_type")
+  listingType    String          @default("sale") @map("listing_type")
+  bedrooms       Int             @default(0)
+  approval       String          @default("RERA Registered")
+  areaSqft       Decimal         @default(1200) @map("area_sqft")
+  furnishing     String          @default("Unfurnished") @map("furnishing")
+
+  /// Land Dimensions for Blueprint Studio
+  frontLength    Float   @map("front_length")
+  backLength     Float   @map("back_length")
+  leftLength     Float   @map("left_length")
+  rightLength    Float   @map("right_length")
+  diagonal       Float?
+  roadSide       String  @map("road_side")
+  roadWidth      Float   @map("road_width")
+  northDirection String  @map("north_direction")
+
+  // Relations matching your Supabase tables
+  localityId     String?         @map("locality_id")
+  locality       Locality?       @relation(fields: [localityId], references: [id])
+  
+  builderId      String?         @map("builder_id")
+  builder        Builder?        @relation(fields: [builderId], references: [id])
+  
+  projectId      String?         @map("project_id")
+  project        Project?        @relation(fields: [projectId], references: [id])
+
+  images         PropertyImage[] 
+  amenities      PropertyAmenity[]
+
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@map("properties")
+}
+
+model PropertyImage {
+  id         String   @id @default(cuid())
+  propertyId String   @map("property_id")
+  imageUrl   String   @map("image_url")
+  isPrimary  Boolean  @default(false) @map("is_primary")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@map("property_images")
+}
+
+model Locality {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  city       String     @default("Madurai")
+  properties Property[]
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  @@map("localities")
+}
+
+model Project {
+  id         String     @id @default(cuid())
+  name       String     @unique
+  properties Property[]
+  createdAt  DateTime   @default(now()) @map("created_at")
+
+  @@map("projects")
+}
+
+model Amenity {
+  id         String            @id @default(cuid())
+  name       String            @unique
+  icon       String?
+  properties PropertyAmenity[]
+  createdAt  DateTime          @default(now()) @map("created_at")
+
+  @@map("amenities")
+}
+
+model PropertyAmenity {
+  id         String   @id @default(cuid())
+  propertyId String   @map("property_id")
+  amenityId  String   @map("amenity_id")
+  
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity    Amenity  @relation(fields: [amenityId], references: [id], onDelete: Cascade)
+
+  @@map("property_amenities")
+}
+
+model Builder {
+  id            String     @id @default(uuid())
+  name          String
+  reraNumber    String?    @map("rera_number")
+  projectsCount Int        @default(0) @map("projects_count")
+  description   String
+  imageUrl      String?    @map("image_url")
+  properties    Property[] 
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+
+  @@map("builders")
+}
+
+model BlogPost {
+  id        String   @id @default(uuid())
+  title     String
+  slug      String   @unique
+  excerpt   String
+  content   String
+  imageUrl  String?  @map("image_url")
+  author    String   @default("Madurai Realtors Team")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  email     String?
+  message   String
+  status    String   @default("NEW") // NEW, CONTACTED, CLOSED
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("leads")
+}
+
+
+
+
