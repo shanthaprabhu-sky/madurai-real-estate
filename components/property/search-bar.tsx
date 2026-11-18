@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PROPERTY_TYPES, BUDGET_RANGES } from '@/lib/constants';
@@ -11,12 +11,26 @@ interface SearchBarProps {
   localities: { id: string; name: string }[];
 }
 
+const MADURAI_COORDS: Record<string, { lat: number; lng: number }> = {
+  'anna nagar': { lat: 9.9195, lng: 78.1460 },
+  'kk nagar': { lat: 9.9324, lng: 78.1449 },
+  'thiruparankundram': { lat: 9.8821, lng: 78.0706 },
+  'othakadai': { lat: 9.9575, lng: 78.1873 },
+  'thirunagar': { lat: 9.8851, lng: 78.0467 },
+  'bypass road': { lat: 9.9142, lng: 78.0970 },
+  'villapuram': { lat: 9.8938, lng: 78.1173 },
+  'mattuthavani': { lat: 9.9442, lng: 78.1565 },
+  'tallakulam': { lat: 9.9328, lng: 78.1322 },
+  'simmakkal': { lat: 9.9261, lng: 78.1211 },
+};
+
 export function SearchBar({ localities }: SearchBarProps) {
   const router = useRouter();
   const [listingType, setListingType] = useState('buy');
   const [locality, setLocality] = useState('any');
   const [propertyType, setPropertyType] = useState('any');
   const [budget, setBudget] = useState('any');
+  const [isLocating, setIsLocating] = useState(false);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -31,6 +45,51 @@ export function SearchBar({ localities }: SearchBarProps) {
       }
     }
     router.push(`/properties?${params.toString()}`);
+  };
+
+  const handleSearchNearMe = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser. Please select a locality manually.');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+
+        let closestLocality: { id: string; name: string } | null = null;
+        let minDistance = Infinity;
+
+        for (const loc of localities) {
+          const coords = MADURAI_COORDS[loc.name.trim().toLowerCase()];
+          if (coords) {
+            const dist = Math.hypot(latitude - coords.lat, longitude - coords.lng);
+            if (dist < minDistance) {
+              minDistance = dist;
+              closestLocality = loc;
+            }
+          }
+        }
+
+        const params = new URLSearchParams();
+        if (listingType !== 'any') params.set('listing_type', listingType);
+
+        if (closestLocality) {
+          setLocality(closestLocality.id);
+          params.set('locality', closestLocality.id);
+        }
+        params.set('near_me', 'true');
+
+        setIsLocating(false);
+        router.push(`/properties?${params.toString()}`);
+      },
+      () => {
+        setIsLocating(false);
+        alert('Location access was denied. Please enable location permissions or choose a locality from the dropdown.');
+      },
+      { enableHighAccuracy: false, timeout: 8000 }
+    );
   };
 
   return (
@@ -95,12 +154,18 @@ export function SearchBar({ localities }: SearchBarProps) {
       </div>
 
       <div className="mt-3 flex items-center gap-2">
-        <MapPin className="h-4 w-4 text-muted-foreground" />
+        {isLocating ? (
+          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        ) : (
+          <MapPin className="h-4 w-4 text-muted-foreground" />
+        )}
         <button
-          onClick={() => router.push('/properties?near_me=true')}
-          className="text-sm text-primary hover:underline"
+          type="button"
+          disabled={isLocating}
+          onClick={handleSearchNearMe}
+          className="text-sm text-primary hover:underline disabled:opacity-60"
         >
-          Search near me
+          {isLocating ? 'Detecting your location...' : 'Search near me'}
         </button>
       </div>
     </div>

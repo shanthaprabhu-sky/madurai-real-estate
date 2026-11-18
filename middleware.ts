@@ -19,7 +19,5 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths the middleware runs on (excludes static files & internal Next.js assets)
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/admin/:path*'],
 };

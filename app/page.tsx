@@ -232,7 +232,7 @@ export default async function HomePage() {
           <div className="mt-6 flex flex-col justify-center gap-4 sm:flex-row items-center">
             <Button size="lg" className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md" asChild>
               <Link href="/contact">
-                <CalendarCheck className="mr-2 h-5 w-5" /> Schedule Free Site Visit
+                <CalendarCheck className="mr-2 h-5 w-5" /> Schedule Site Visit
               </Link>
             </Button>
             <Button 

@@ -16,6 +16,7 @@ function ContactForm() {
 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [phone, setPhone] = useState('');
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -68,7 +69,23 @@ function ContactForm() {
       </div>
       <div>
         <Label htmlFor="phone">Phone *</Label>
-        <Input id="phone" name="phone" required type="tel" className="mt-1.5" />
+        <Input
+          id="phone"
+          type="tel"
+          name="phone"
+          required
+          inputMode="numeric"
+          pattern="[0-9]{10}"
+          maxLength={10}
+          value={phone}
+          onChange={(e) => {
+            const onlyNumbers = e.target.value.replace(/\D/g, '').slice(0, 10);
+            setPhone(onlyNumbers);
+          }}
+          placeholder="Enter 10-digit mobile number"
+          title="Please enter a valid 10-digit mobile number"
+          className="mt-1.5 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+        />
       </div>
       <div>
         <Label htmlFor="email">Email</Label>

@@ -9,7 +9,7 @@ import Link from 'next/link';
 import type { PropertyWithRelations, Locality } from '@/lib/types';
 
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 const PAGE_SIZE = 9;
 

@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 const prisma = new PrismaClient();
 
-export const revalidate = 3600;
+export const revalidate = 0; // Caches the page for 0 seconds so clicks are instant
 
 export async function generateMetadata() {
   return {

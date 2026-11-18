@@ -6,6 +6,8 @@ export const metadata = {
   description: `Learn about ${COMPANY.name}, Madurai's trusted real estate platform.`,
 };
 
+export const revalidate = 60;
+
 export default function AboutPage() {
   const values = [
     { icon: ShieldCheck, title: 'Trust & Transparency', desc: 'We verify every listing and maintain complete transparency in all dealings.' },

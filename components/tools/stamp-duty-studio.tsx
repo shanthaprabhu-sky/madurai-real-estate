@@ -51,28 +51,6 @@ export function StampDutyStudio() {
               <span>₹1.5 Crores</span>
             </div>
           </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-slate-900 uppercase block">Location Zone Type</label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => setIsUrban(true)}
-                className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-all ${
-                  isUrban ? 'bg-amber-600 text-white border-amber-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200'
-                }`}
-              >
-                Urban / Corporation
-              </button>
-              <button
-                onClick={() => setIsUrban(false)}
-                className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-all ${
-                  !isUrban ? 'bg-amber-600 text-white border-amber-600 shadow-sm' : 'bg-white text-slate-700 border-slate-200'
-                }`}
-              >
-                Rural / Panchayat
-              </button>
-            </div>
-          </div>
         </div>
 
         <div className="lg:col-span-6 bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col justify-between space-y-6">
